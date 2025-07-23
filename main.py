@@ -11,6 +11,8 @@ from transformers import GenerationConfig, LlamaForCausalLM, LlamaTokenizer
 from utils.callbacks import Iteratorize, Stream
 from utils.prompter import Prompter
 
+import pandas as pd
+
 if torch.cuda.is_available():
     device = "cuda"
 else:
@@ -190,20 +192,33 @@ def main():
     # ).queue().launch(server_name="0.0.0.0", share=share_gradio)
 
     # testing code for readme
-    for instruction in [
-        "Tell me about alpacas.",
-        "Tell me about the president of Mexico in 2019.",
-        "Tell me about the king of France in 2019.",
-        "List all Canadian provinces in alphabetical order.",
-        "Write a Python program that prints the first 10 Fibonacci numbers.",
-        "Write a program that prints the numbers from 1 to 100. But for multiples of three print 'Fizz' instead of the number and for the multiples of five print 'Buzz'. For numbers which are multiples of both three and five print 'FizzBuzz'.",  # noqa: E501
-        "Tell me five words that rhyme with 'shock'.",
-        "Translate the sentence 'I have no mouth but I must scream' into Spanish.",
-        "Count up from 1 to 500.",
-    ]:
-        print("Instruction:", instruction)
-        print("Response:", evaluate(instruction))
-        print()
+    # for instruction in [
+    #     # "Tell me about alpacas.",
+    #     # "Tell me about the president of Mexico in 2019.",
+    #     # "Tell me about the king of France in 2019.",
+    #     # "List all Canadian provinces in alphabetical order.",
+    #     # "Write a Python program that prints the first 10 Fibonacci numbers.",
+    #     # "Write a program that prints the numbers from 1 to 100. But for multiples of three print 'Fizz' instead of the number and for the multiples of five print 'Buzz'. For numbers which are multiples of both three and five print 'FizzBuzz'.",  # noqa: E501
+    #     # "Tell me five words that rhyme with 'shock'.",
+    #     # "Translate the sentence 'I have no mouth but I must scream' into Spanish.",
+    #     # "Count up from 1 to 500.",
+    # ]:
+    #     print("Instruction:", instruction)
+    #     print("Response:", evaluate(instruction))
+    #     print()
+    df = pd.read_parquet("datasets/rephrase_data_samples_en_table.parquet")
+
+    # print(df.columns.tolist())
+
+    columns_of_interest = ['input_query_id', 'input_product_description', 'label_product_title']
+    # print(df[columns_of_interest].head(10))
+    first_row = df.loc[0, columns_of_interest]
+
+    instruction = "Modify the input to support brand \"Hilitchi\""
+    input = str(first_row["input_product_description"])[:100]
+    print("Instruction:", instruction)
+    print("Input:", input)
+    print("Response:", evaluate(instruction, input=input))
 
 
 # Press the green button in the gutter to run the script.

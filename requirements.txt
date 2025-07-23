@@ -6,3 +6,6 @@ peft==0.5.0
 sentencepiece==0.1.99
 bitsandbytes==0.41.0
 scipy==1.10.1
+fire
+gradio==3.0
+loralib
